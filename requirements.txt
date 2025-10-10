@@ -1,0 +1,8 @@
+pandas>=2.2
+numpy>=1.26
+python-dotenv>=1.0
+Telethon>=1.36
+pytz>=2024.1
+matplotlib>=3.8
+# Optional broker connectors
+MetaTrader5>=5.0; platform_system != "Darwin"  # MT5 Python not available on Mac ARM
