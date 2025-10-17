@@ -1,0 +1,11 @@
+# secrets never committed
+.env
+*.env
+fix/*.cfg
+# local data
+data/*
+!data/README.md
+# artifacts
+*.parquet
+*.csv
+__pycache__/
