@@ -59,7 +59,6 @@ def get_data_provider(args):
             raise RuntimeError("MetaTrader5 not available on this platform.")
         return MT5Provider()    
 
-
     # csv (default)
     class CSVProvider:
         def candles(self, symbol: str, start: datetime, end: datetime, timeframe="M1"):
