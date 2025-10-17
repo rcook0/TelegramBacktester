@@ -97,7 +97,24 @@ def get_data_provider(args):
             return df.sort_values("time").reset_index(drop=True)
 
     return CSVProvider()
-
+    
+# provider factory -> connector factory
+def get_connector(args) -> Connector:
+    if args.data_source == "ctrader":
+        from src.connectors.ctrader import CTraderConnector
+        return CTraderConnector(
+            client_id=args.ctrader_client_id, client_secret=args.ctrader_client_secret,
+            access_token=args.ctrader_access_token, account_id=args.ctrader_account_id,
+            host=args.ctrader_host
+        )
+    if args.data_source == "fix":
+        from src.connectors.fix import FIXConnector
+        return FIXConnector(cfg_path=args.fix_cfg, symbols=[s.strip() for s in args.fix_symbols.split(",")])
+    if args.data_source == "mt5":
+        from src.connectors.mt5 import MT5Connector
+        return MT5Connector()
+    from src.connectors.csv_provider import CSVConnector
+    return CSVConnector()
 
 def load_env_defaults(args):
     # Only non-secret defaults; safe to keep
