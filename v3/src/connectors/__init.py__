@@ -1,0 +1,2 @@
+# src/connectors/__init__.py
+from .csv_provider import CSVConnector  # convenience export
