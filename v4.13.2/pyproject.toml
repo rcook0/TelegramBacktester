@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "telegram-fx-backtester"
+version = "4.13.2"
+description = "Telegram signal parser + cTrader/MT5 data adapters + WAP-depth simulator and risk gate"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "Ryan & Co", email = "devnull@example.com"}]
+dependencies = [
+  "pandas>=2.2",
+  "python-dotenv>=1.0",
+  "pydantic>=2.4",
+  "numpy>=1.26",
+  "requests>=2.32",
+]
+
+[project.optional-dependencies]
+ctrader = ["ctrader-open-api>=0.9", "twisted>=22"]
+dev = [
+  "ruff>=0.6",
+  "mypy>=1.10",
+  "pytest>=8.0",
+  "pytest-cov>=5.0",
+  "pre-commit>=3.7",
+]
+dash = ["dash>=2.17", "plotly>=5.22"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+telegram_fx_backtester = ["config/*.json", "fixtures/**/*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-select = ["I"]
+exclude = ["build", "dist", ".venv"]
+
+[tool.mypy]
+python_version = "3.11"
+warn_unused_configs = true
+strict = false
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+addopts = "-q"
