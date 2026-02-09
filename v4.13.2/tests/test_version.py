@@ -1,0 +1,3 @@
+from telegram_fx_backtester import __version__
+def test_version():
+    assert __version__ == "4.10.0"

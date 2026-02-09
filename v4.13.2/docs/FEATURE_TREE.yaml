@@ -1,0 +1,168 @@
+project:
+  name: telegram-fx-backtester
+  description: |
+    Telegram signal ingestion + broker market data capture + execution shadowing + reconciliation stack.
+  doc_system:
+    source_of_truth: docs/FEATURE_TREE.yaml
+    generated:
+      - docs/USER_MANUAL.md
+      - docs/TECHNICAL_GUIDE.md
+      - docs/VERSION_HISTORY.md
+
+pipelines:
+  shadow_parity:
+    title: Shadow parity pipeline (signal → execution → reconcile)
+    steps:
+      - id: telegram_ingest
+        title: Telegram ingest + parse
+        status: implemented
+        entrypoints:
+          - python -m src.main --channel <name_or_id> --since ... --until ... --data-source ...
+        artifacts:
+          tables: [signals]
+      - id: ctrader_capture
+        title: cTrader capture (quote/depth) window
+        status: implemented
+        entrypoints:
+          - python -m src.runners.ctrader_shadow_capture ...
+        artifacts:
+          snapshots: [quote, depth, depth_book, capture_window]
+      - id: ctrader_deallist
+        title: cTrader DealList fills capture
+        status: implemented
+        entrypoints:
+          - python -m src.runners.ctrader_deallist_fills ...
+        artifacts:
+          snapshots: [deal, deal_norm]
+      - id: deal_align
+        title: Deal ↔ signal alignment (context attach)
+        status: implemented
+        entrypoints:
+          - python -m src.runners.ctrader_align_deals ...
+        artifacts:
+          snapshots: [deal_aligned]
+      - id: knitting
+        title: Knitting (partial fills → stitched execution)
+        status: implemented
+        entrypoints:
+          - python -m src.runners.ctrader_knit_exec ...
+        artifacts:
+          snapshots: [exec_knit]
+      - id: linkage
+        title: Linkage (ENTRY/EXIT mapping to trace)
+        status: implemented
+        entrypoints:
+          - python -m src.runners.ctrader_linkage ...
+        artifacts:
+          snapshots: [trade_link, pnl_attrib]
+          tables: [trade_links, trade_link_execs]
+- id: reconciliation_v3
+  title: Reconciliation v3 (trade-link expected vs actual)
+  status: implemented
+  entrypoints:
+    - python -m src.runners.reconcile_v3 ...
+  artifacts:
+    snapshots: [recon_v3]
+    tables: [trade_recon_v3]
+- id: threshold_packs
+  title: Threshold packs (Shadow Gate policy)
+  status: implemented
+  entrypoints:
+    - python -m src.runners.threshold_eval ...
+  artifacts:
+    snapshots: [threshold_eval]
+    tables: [threshold_packs, signal_threshold_eval]
+- id: report_pack
+  title: Report pack (batch export: CSV/JSON/HTML)
+  status: implemented
+  entrypoints:
+    - python -m src.runners.report_pack ...
+  artifacts:
+    files: [reports/*.csv, reports/*.json, reports/*.html]
+
+releases:
+  - version: "4.12.0"
+    title: "DealList fills capture"
+    roadmap_line: "capture actual executions (deals)"
+    release_doc: "docs/releases/v4.12.0.md"
+  - version: "4.12.1"
+    title: "Normalization + symbol meta caching"
+    roadmap_line: "deal_norm + symbol_meta"
+    release_doc: "docs/releases/v4.12.1.md"
+  - version: "4.12.2"
+    title: "Deal ↔ signal alignment"
+    roadmap_line: "attach quote/depth context"
+    release_doc: "docs/releases/v4.12.2.md"
+  - version: "4.12.3"
+    title: "Knitting (partial-fill stitching)"
+    roadmap_line: "deal_aligned -> exec_knit"
+    release_doc: "docs/releases/v4.12.3.md"
+  - version: "4.12.4"
+    title: "Linkage (execution lifecycle mapping)"
+    roadmap_line: "exec_knit -> trade_links (ENTRY/EXIT)"
+    release_doc: "docs/releases/v4.12.4.md"
+    assistant_notes:
+      why: "Trade-level parity needs explicit lifecycle mapping, not fill-level noise."
+      unlocks: ["trade-level reconciliation", "threshold gating inputs", "report pack"]
+      caveats: ["pnl_ccy attribution deferred to v4.12.5 (pip value + conversion)"]
+  - version: "4.12.6"
+    title: "Reconciliation v3 (trade-link expected vs actual)"
+    roadmap_line: "trade_links (+pnl) -> trade_recon_v3"
+    release_doc: "docs/releases/v4.12.6.md"
+    assistant_notes:
+      why: "You need a deterministic diff between model intent and execution reality to drive gating and reporting."
+      unlocks: ["threshold packs (v4.12.7)", "report pack", "live shadow scoring"]
+      caveats: ["Expected prices depend on trace events including px; ensure trace emits ENTRY/EXIT prices"]
+  - version: "4.12.8"
+    title: "Report pack (batch export)"
+    roadmap_line: "shadow pipeline -> CSV/JSON/HTML report artifacts"
+    release_doc: "docs/releases/v4.12.8.md"
+    assistant_notes:
+      why: "Turns database state into portable artifacts and stable KPI summaries."
+      unlocks: ["Dash dashboards", "weekly automation", "threshold calibration"]
+      caveats: ["Joins use latest rows per signal; multi-trade signals need aggregation later"]
+- id: batch_eval
+  title: Batch eval (reconcile + threshold packs)
+  status: implemented
+  entrypoints:
+    - python -m src.runners.reconcile_batch_v3 ...
+    - python -m src.runners.threshold_batch_eval ...
+    - python -m src.runners.shadow_batch_pipeline ...
+  artifacts:
+    files: [reports/*.json]
+  - version: "4.12.9"
+    title: "Batch eval (reconcile + thresholds)"
+    roadmap_line: "windowed runs: signals -> recon_v3 -> threshold_eval -> report"
+    release_doc: "docs/releases/v4.12.9.md"
+    assistant_notes:
+      why: "Makes the shadow pipeline runnable over weeks/months of data without per-signal babysitting."
+      unlocks: ["scheduled reports", "dash refresh", "calibration loops"]
+      caveats: ["Assumes trade_links already exist; does not create executions"]
+- id: weekly_ops
+  title: Weekly ops (scheduled batch pipeline)
+  status: implemented
+  entrypoints:
+    - python -m src.runners.weekly_ops ...
+  artifacts:
+    tables: [ops_runs, ops_artifacts]
+    files: [reports/*]
+  - version: "4.13.0"
+    title: "Weekly ops (scheduled pipeline)"
+    roadmap_line: "one-shot weekly reconcile+threshold+report with rotation + audit"
+    release_doc: "docs/releases/v4.13.0.md"
+- id: ops_status
+  title: Ops status line (browser + dash + terminal)
+  status: implemented
+  entrypoints:
+    - python -m src.runners.ops_status ...
+    - python -m src.ui.dash_status_app ...
+  artifacts:
+    files: [reports/status_latest.json, reports/status_latest.txt, reports/status_latest.html]
+  - version: "4.13.1"
+    title: "Ops status line (browser + dash + terminal)"
+    roadmap_line: "status_latest artifacts + ops_status CLI + optional Dash status tab"
+    release_doc: "docs/releases/v4.13.1.md"
+  - version: "4.13.2"
+    title: "Ops policy polish (pass rate + missing recon)"
+    roadmap_line: "policy-based OK/WARN/ERROR + reasons in status_latest"
+    release_doc: "docs/releases/v4.13.2.md"
