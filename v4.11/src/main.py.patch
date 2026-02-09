@@ -1,0 +1,18 @@
+--- a/src/main.py
++++ b/src/main.py
+@@
+-    # (no --preset before)
++    # Presets
++    p.add_argument("--preset", type=str, default=None, help="Broker preset (e.g., vantage, fpmarkets)")
+@@
+-    symbol_map = json.loads(args.symbol_map)
+-    contract_map = json.loads(args.contract_map)
+-    conv_map = json.loads(args.conv_map)
++    preset_maps = {"symbol_map": {}, "contract_map": {}, "conv_map": {}}
++    if args.preset:
++        from .presets.loader import load_preset_bundle
++        preset_maps = load_preset_bundle(args.preset)
++        print(f"[preset] Loaded '{args.preset}'")
++    symbol_map   = {**preset_maps["symbol_map"],   **json.loads(args.symbol_map)}
++    contract_map = {**preset_maps["contract_map"], **json.loads(args.contract_map)}
++    conv_map     = {**preset_maps["conv_map"],     **json.loads(args.conv_map)}

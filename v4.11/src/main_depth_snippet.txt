@@ -1,0 +1,20 @@
+# Add to argparse:
+--fill-model bar|depth
+--impact-k 0.0
+--depth-source none|csv|ctrader
+--depth-dir <path>
+
+# In main(), after args parsed:
+depth_provider = None
+if args.fill_model == 'depth' and args.depth_source != 'none':
+    if args.depth_source == 'csv':
+        from .depth.depth_provider import CSVDepthProvider
+        depth_provider = CSVDepthProvider(args.depth_dir or 'fixtures/depth')
+    elif args.depth_source == 'ctrader':
+        # TODO: wrap your cTrader depth source into a provider yielding DepthSnapshot
+        from .depth.depth_provider import DepthProvider  # interface only
+        depth_provider = None  # replace with real adapter
+
+# Pass depth_provider and impact_k into your Backtester / simulator init.
+# Example (if you integrate inside Backtester):
+# bt = Backtester(..., fill_model=args.fill_model, impact_k=args.impact_k, depth_provider=depth_provider)

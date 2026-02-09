@@ -1,0 +1,8 @@
+# Backtester integration (diff-style notes)
+# 1) Accept new args on Backtester.__init__:
+#    fill_model: str, impact_k: float, depth_provider, lat_model: LatencyModel, wap_guard: AdverseWAPGuard
+# 2) When constructing OrderConfig, include:
+#    OrderConfig(..., fill_model=self.fill_model, impact_k=self.impact_k,
+#                depth_provider=self.depth_provider, symbol=symbol, timestamp=entry_time,
+#                lat_model=self.lat_model, wap_guard=self.wap_guard, ms_per_bar=self.ms_per_bar)
+# 3) Set ms_per_bar from timeframe: {'M1':60000, 'M5':300000, 'M15':900000, 'H1':3600000}[args.timeframe]

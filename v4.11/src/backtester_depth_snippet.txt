@@ -1,0 +1,16 @@
+# In Backtester.__init__, accept:
+#   fill_model: 'bar'|'depth', impact_k: float, depth_provider: DepthProvider | None
+# When creating each OrderSimulator, pass:
+#   OrderConfig(..., fill_model=fill_model, impact_k=impact_k, depth_provider=depth_provider, symbol=symbol, timestamp=entry_time)
+
+# In argparse (main.py), add:
+#   --fill-model bar|depth
+#   --impact-k 0.0
+#   --depth-source none|csv|ctrader
+#   --depth-dir <path>  # for csv
+
+# When wiring depth provider from flags:
+#   if args.fill_model=='depth':
+#       if args.depth_source=='csv': depth_provider = CSVDepthProvider(args.depth_dir)
+#       elif args.depth_source=='ctrader': depth_provider = CTraderDepthProvider(); depth_provider.wire_provider(...)
+#       else: depth_provider=None

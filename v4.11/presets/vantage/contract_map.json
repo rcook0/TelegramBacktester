@@ -1,0 +1,8 @@
+{
+  "XAUUSD": {
+    "contract_size": 100
+  },
+  "GBPJPY": {
+    "contract_size": 100000
+  }
+}

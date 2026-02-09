@@ -1,0 +1,13 @@
+# argparse
+--latency-ms 0
+--max-adverse-wap-pct 0.0
+
+# main()
+from src.execution.latency_guard import LatencyModel, AdverseWAPGuard
+lat_model = LatencyModel(args.latency_ms)
+wap_guard = AdverseWAPGuard(args.max_adverse_wap_pct)
+
+# Pass into simulator/backtester. At execution points:
+# 1) Shift the effective timestamp by 'latency' bars or ms (depending on your timebase).
+# 2) After computing WAP, call:
+#    if not wap_guard.allowed(intended_px, wap_px): reject / skip / log-violation.

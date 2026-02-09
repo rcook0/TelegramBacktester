@@ -1,0 +1,21 @@
+# Add flags (if not already present):
+--fill-model bar|depth
+--impact-k 0.0
+--depth-source none|csv|ctrader
+--depth-dir <path>
+
+# Setup in main():
+depth_provider = None
+if args.fill_model == 'depth' and args.depth_source == 'ctrader':
+    from src.depth.ctrader_depth_provider import CTraderDepthProvider
+    from src.data_providers.ctrader_provider import CTraderProvider
+    ctd = CTraderDepthProvider()
+    # Using your existing args for credentials
+    ct = CTraderProvider(client_id=args.ctrader_client_id, client_secret=args.ctrader_client_secret,
+                         access_token=args.ctrader_access_token, account_id=args.ctrader_account_id,
+                         host=args.ctrader_host)
+    # Try to wire callback; fallback leaves manual feeding
+    updater = ctd.wire_provider(ct, symbols=['XAUUSD','EURUSD'])  # pass your needed symbols
+    depth_provider = ctd
+
+# Pass depth_provider into your Backtester / simulator.

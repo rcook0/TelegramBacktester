@@ -1,0 +1,8 @@
+{
+  "XAUUSD": {
+    "contract_size": 100
+  },
+  "EURUSD": {
+    "contract_size": 100000
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "symbols": {
+    "EURUSD": {
+      "contract_size": 100000,
+      "pip_size": 0.0001,
+      "tick_size": 1e-05,
+      "price_dp": 5,
+      "min_lot": 0.01,
+      "lot_step": 0.01,
+      "value_ccy": "USD"
+    },
+    "GBPJPY": {
+      "contract_size": 100000,
+      "pip_size": 0.01,
+      "tick_size": 0.001,
+      "price_dp": 3,
+      "min_lot": 0.01,
+      "lot_step": 0.01,
+      "value_ccy": "JPY"
+    },
+    "USDJPY": {
+      "contract_size": 100000,
+      "pip_size": 0.01,
+      "tick_size": 0.001,
+      "price_dp": 3,
+      "min_lot": 0.01,
+      "lot_step": 0.01,
+      "value_ccy": "JPY"
+    },
+    "GBPUSD": {
+      "contract_size": 100000,
+      "pip_size": 0.0001,
+      "tick_size": 1e-05,
+      "price_dp": 5,
+      "min_lot": 0.01,
+      "lot_step": 0.01,
+      "value_ccy": "USD"
+    },
+    "XAUUSD": {
+      "contract_size": 100,
+      "pip_size": 0.1,
+      "tick_size": 0.01,
+      "price_dp": 2,
+      "min_lot": 0.01,
+      "lot_step": 0.01,
+      "value_ccy": "USD"
+    },
+    "XAGUSD": {
+      "contract_size": 5000,
+      "pip_size": 0.1,
+      "tick_size": 0.01,
+      "price_dp": 2,
+      "min_lot": 0.01,
+      "lot_step": 0.01,
+      "value_ccy": "USD"
+    },
+    "US30": {
+      "contract_size": 1,
+      "pip_size": 1.0,
+      "tick_size": 1.0,
+      "price_dp": 0,
+      "min_lot": 0.1,
+      "lot_step": 0.1,
+      "value_ccy": "USD"
+    },
+    "BTCUSD": {
+      "contract_size": 1,
+      "pip_size": 1.0,
+      "tick_size": 0.5,
+      "price_dp": 1,
+      "min_lot": 0.01,
+      "lot_step": 0.01,
+      "value_ccy": "USD"
+    }
+  }
+}

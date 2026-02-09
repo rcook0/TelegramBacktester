@@ -1,0 +1,13 @@
+{
+  "aliases": {
+    "XAUUSD.i": "XAUUSD",
+    "XAUUSDm": "XAUUSD",
+    "XAUUSDc": "XAUUSD",
+    "GOLD": "XAUUSD",
+    "GJ": "GBPJPY",
+    "EU": "EURUSD",
+    "BTCUSD.p": "BTCUSD",
+    "US30.cash": "US30",
+    "DJ30": "US30"
+  }
+}
